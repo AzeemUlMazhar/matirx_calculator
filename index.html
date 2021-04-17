@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Operations</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.3.0/math.min.js" integrity="sha512-pRkiEK307FcdaOBL0UjEh6i+AZTq+utCsISMzSHV6x2YvXpVKTyV7MK28mJ0YGwqZgX/KtRiaciWLkILU9iUkA==" crossorigin="anonymous"></script>
+
+
+</head>
+<body>
+    
+
+    <label for="matrixNum">Input Number of Matrices</label>
+    <input type="number" min="1" max="2" id="matrixNum" name="matrixNum">
+    <span id="error"></span>
+    <button type="submit" id="matrixNum_submit" name="matrixNum_submit" onclick="matrixNum_submit()">Submit</button>
+    
+    <!--matrices details-->
+    <div class="matDetails" style="display: none;">
+        <div class="mat1" style="display: none;">
+            <h2>Matrix 1</h2>
+            <label for="mat1col">Enter Number of columns for Matrix 1:</label>
+            <input type="number" min="2" max="5" id="mat1col" name="mat1col">
+            <label for="mat1rows">Enter Number of rows for Matrix 1:</label>
+            <input type="number" min="2" max="5" id="mat1rows" name="mat1rows">
+        </div>
+        <div class="mat2" style="display: none;">
+            <h2>Matrix 2</h2>
+            <label for="mat2col">Enter Number of columns for Matrix 2:</label>
+            <input type="number" min="2" max="5" id="mat2col" name="mat2col">
+            <label for="mat2rows">Enter Number of rows for Matrix 2:</label>
+            <input type="number" min="2" max="5" id="mat2rows" name="mat2rows">
+        </div>
+        <div id="error_matDetails"></div>
+        <button type="submit" id="matDetails" onclick="matDetails()">Submit</button>
+    </div>
+
+    <!--If user has previous selected 1 as number of matrix it should give user following possible options to go with:-->
+    <div id="singleMatOps" style="display: none;">
+        <button type="submit" id="btn_determinant">Find Determinant</button>
+        <button type="submit" id="btn_transpose">Find Transpose</button>
+        <button type="submit" id="btn_inverse">Find Inverse</button>
+        <button type="submit" id="btn_addScalar">Add Scalar</button>
+        <button type="submit" id="btn_multiplyScalar">Multiply with Scalar</button>
+    </div>
+
+
+
+
+    <!-- math.js testing -->
+    <!-- <script type="text/javascript">
+        console.log(math.sqrt(-4).toString()) // 2i
+    </script> -->
+
+    <script>
+       
+      
+
+        function matrixNum_submit(){
+           
+            var matrixNum=parseInt($("#matrixNum").val());
+            console.log(matrixNum);
+            if(matrixNum==1 || matrixNum ==2){
+                console.log("ok");
+                $("#error").html("");
+
+                    //control matrices details display block based on how many number of matrices user entered
+                if(matrixNum==1){
+                    $(".matDetails").css("display","block");
+                    $(".mat1").css("display", "block");
+                    $(".mat2").css("display", "none");
+                } 
+                else if(matrixNum==2){
+                    $(".matDetails").css("display","block");
+                    $(".mat1").css("display", "block");
+                    $(".mat2").css("display", "block");
+
+                     //hide single matrix operations
+                     $("#singleMatOps").css("display", "none");
+                }
+                else{
+                    $(".matDetails").css("display","none");
+                    $(".mat1").css("display", "none");
+                    $(".mat2").css("display", "none");
+                }
+            }
+            else{
+                console.log("not ok,enter 1 or 2");
+                $("#error").html("Enter 1 OR 2");
+
+                //control matrices details display block based on how many number of matrices user entered
+                //if user entered number of matrices other then 1 or 2
+                    $(".matDetails").css("display","none");
+                    $(".mat1").css("display", "none");
+                    $(".mat2").css("display", "none");
+            }
+
+            
+       }
+       function matDetails(){
+        var matrixNum=parseInt($("#matrixNum").val());
+
+        var mat1col=parseInt($("#mat1col").val());
+        var mat1rows=parseInt($("#mat1rows").val());
+
+        var mat2col=parseInt($("#mat2col").val());
+        var mat2rows=parseInt($("#mat2rows").val());
+
+            if(matrixNum==1){
+                if(mat1col < 2 || mat1col >5 || mat1rows <2 || mat1rows>5 
+                    || !$("#mat1col").val() || !$("#mat1rows").val() ){
+                    $("#error_matDetails").html("Number of rows should be 2 to 5 & Number of colums should also be 2 to 5.");
+                }
+                else{
+                    $("#error_matDetails").html("");
+
+                    //display matrix input fields
+                    function tableCreate() {
+                        var body = document.getElementsByTagName('body')[0];
+                        var tbl = document.createElement('table');
+                        tbl.style.width = '70vw';
+                        tbl.style.height="100px";
+                        tbl.setAttribute('border', '1');
+                        var tbdy = document.createElement('tbody');
+                        for (var i = 0; i < mat1rows; i++) {
+                            var tr = document.createElement('tr');
+                            for (var j = 0; j < mat1col; j++) {
+                            if (i == mat1rows && j == mat1col) {
+                                break;
+                            } else {
+                                var td = document.createElement('td');
+                                td.appendChild(document.createTextNode('\u0020'));
+                                i == 1 && j == 1 ? td.setAttribute('rowSpan', '1') : null;
+                                tr.appendChild(td);
+                                var inp=document.createElement("input");
+                                inp.setAttribute('type','number');
+                                inp.style.width="100%";
+                                inp.style.height="100%";
+                                var inpId='inp'+i.toString()+j.toString();
+                                console.log(inpId);
+                                inp.setAttribute('id',inpId);
+                                td.appendChild(inp);
+                            }
+                            }
+                            tbdy.appendChild(tr);
+                        }
+                        tbl.appendChild(tbdy);
+                        body.appendChild(tbl);
+                        }
+                    tableCreate();
+
+                    //display single matrix operations
+                    $("#singleMatOps").css("display", "block");
+                    
+                    //finding determinant
+                    $("#btn_determinant").click(function(){
+                        
+                    });
+
+                }
+            }
+            else if(matrixNum==2){
+                if(mat1col < 2 || mat1col >5 || mat1rows <2 || mat1rows>5 || mat2col <2 ||mat2col>5 || mat2rows<2 || mat2rows>5
+                    || !$("#mat1col").val() || !$("#mat1rows").val() ||  !$("#mat2col").val() || !$("#mat2rows").val()){
+                    $("#error_matDetails").html("Number of rows should be 2 to 5 & Number of colums should also be 2 to 5.");
+                }
+                else{
+                    $("#error_matDetails").html("");
+
+                    //hide single matrix operations
+                    $("#singleMatOps").css("display", "none");
+                }
+            }
+       }
+
+     
+       
+    </script>
+</body>
+</html>
